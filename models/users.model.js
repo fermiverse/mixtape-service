@@ -27,7 +27,7 @@ const trackSchema = new Schema({
         required: true
     },
     artists: {
-        type: Array,
+        type: [String],
         required: true
     },
     likes: {
@@ -62,6 +62,8 @@ const mixSchema = new Schema({
     cover: {
         type: String
     }
+}, {
+    timestamps: true
 });
 
 const userSchema = new Schema({

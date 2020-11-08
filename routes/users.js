@@ -1,5 +1,8 @@
 const router = require("express").Router();
+let cors = require("cors");
 let User = require("../models/users.model");
+
+router.use(cors());
 
 router.route("/:sid").get(async (req, res) => {
     try {

@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors");
+let cors = require("cors");
 const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const cookieParser = require("cookie-parser");
@@ -14,8 +14,6 @@ app.use(express.static("public"));
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-
-app.set("view engine", "ejs");
 
 const uri = process.env.ATLAS_URI;
 mongoose.connect(uri, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true}, function(error) {
