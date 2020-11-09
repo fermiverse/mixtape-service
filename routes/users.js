@@ -9,9 +9,10 @@ router.route("/:sid").get(async (req, res) => {
         let {sid} = req.params;
         if (sid) {
             await User.findOne({spotifyId: sid}).then((user) => {
-                res.status(200).json({user: user});
+                if (user) res.status(200).json({user: user});
+                else res.status(404).json({error: "User does not exist"});
             }).catch((err) => {
-                res.json({error: "User does not exist"});
+                res.status(404).json({error: "User does not exist"});
             })
         } else {
             res.status(400).json({error: "Missing spotify Id"});
@@ -59,7 +60,7 @@ router.route("/:sid/mixes/find").get(async (req, res) => {
             }).then((mix) => {
                 res.status(200).json({mix: mix});
             }).catch((err) => {
-                res.json({error: "User does not exist"});
+                res.status(404).json({error: "User does not exist"});
             })
         } else {
             res.status(400).json({error: "Missing spotify Id"});
@@ -83,7 +84,7 @@ router.route("/:sid/mixes/add").post(async (req, res) => {
             }).then((user) => {
                 res.status(200).json({conf: "Mix added"});
             }).catch((err) => {
-                res.json({error: "User does not exist"});
+                res.status(404).json({error: "User does not exist"});
             })
         } else {
             res.status(400).json({error: "Unable to add mix"});
@@ -163,11 +164,14 @@ router.route("/create").post(async (req, res) => {
         let {name, spotifyId} = req.body;
         if (name && spotifyId) {
             const user = new User({
-                name,
-                spotifyId
+                name: name,
+                spotifyId: spotifyId
             });
             await user.save(function(err, user) {
-                if (err) res.status(400).json({error: "Could not create user"});
+                if (err) {
+                    res.status(400).json({error: "Could not create user"});
+                    console.log(err);
+                }
                 else res.status(200).json({id: user._id});
             });
         } else {

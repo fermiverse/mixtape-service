@@ -38,8 +38,7 @@ const trackSchema = new Schema({
 const mixSchema = new Schema({
     id: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     tracks: {
         type: [trackSchema]
@@ -53,8 +52,7 @@ const mixSchema = new Schema({
     },
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     description: {
         type: String
@@ -73,8 +71,7 @@ const userSchema = new Schema({
     },
     spotifyId: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     mixes: {
         type: [mixSchema]
