@@ -74,7 +74,8 @@ const userSchema = new Schema({
         required: true
     },
     mixes: {
-        type: [mixSchema]
+        type: [mixSchema],
+        required: false
     }
 }, {
     timestamps: true

@@ -75,6 +75,7 @@ router.route("/:sid/mixes/add").post(async (req, res) => {
         let {sid} = req.params;
         let {mix} = req.body;
         if (sid && mix) {
+            console.log(mix);
             await User.findOneAndUpdate({
                 spotifyId: sid
             }, {
@@ -82,8 +83,10 @@ router.route("/:sid/mixes/add").post(async (req, res) => {
                     mixes: mix
                 }
             }).then((user) => {
+                console.log(user);
                 res.status(200).json({conf: "Mix added"});
             }).catch((err) => {
+                console.log(err);
                 res.status(404).json({error: "User does not exist"});
             })
         } else {
