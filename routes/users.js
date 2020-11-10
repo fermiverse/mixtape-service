@@ -4,6 +4,10 @@ let User = require("../models/users.model");
 
 router.use(cors());
 
+router.route("/").get((req, res) => {
+    res.json({ping: 1});
+});
+
 router.route("/:sid").get(async (req, res) => {
     try {
         let {sid} = req.params;
