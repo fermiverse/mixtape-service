@@ -26,6 +26,38 @@ router.route("/:sid").get(async (req, res) => {
     }
 });
 
+const filterFields = (fields) => {
+    let nonNullKeys = Object.keys(fields).filter(key => key !== null);
+    let nonNullFields = {};
+    for (let keys of nonNullKeys) {
+        nonNullFields[key] = fields[key];
+    }
+    return nonNullFields;
+};
+
+router.route("/:sid/update").post(async (req, res) => {
+    try {
+        let {sid} = req.params;
+        let {name, genres, description, cover} = req.body;
+        if (sid) {
+            await User.findOneAndUpdate({spotifyId: sid}, {
+                $set: {
+                    name, genres, description, cover
+                }
+            }).then((user) => {
+                if (user) res.status(200).json({conf: "User updated"});
+                else res.status(404).json({error: "User does not exist"});
+            }).catch((err) => {
+                res.status(404).json({error: "User does not exist"});
+            })
+        } else {
+            res.status(400).json({error: "Missing spotify Id"});
+        }
+    } catch (error) {
+        res.status(400).json({error: "Malformed request"});
+    }
+});
+
 router.route("/:sid/mixes/all").get(async (req, res) => {
     try {
         let {sid} = req.params;
@@ -43,6 +75,10 @@ router.route("/:sid/mixes/all").get(async (req, res) => {
     }
 });
 
+const getName = (name) => {
+    return name.split("%20").join(" ");
+};
+
 router.route("/:sid/mixes/find").get(async (req, res) => {
     try {
         let {sid} = req.params;
@@ -52,7 +88,7 @@ router.route("/:sid/mixes/find").get(async (req, res) => {
                 spotifyId: sid,
                 mixes: {
                     $elemMatch: {
-                        name: name
+                        name: getName(name)
                     }
                 }
             }, {
@@ -61,8 +97,8 @@ router.route("/:sid/mixes/find").get(async (req, res) => {
                         name: name
                     }
                 }
-            }).then((mix) => {
-                res.status(200).json({mix: mix});
+            }).then((user) => {
+                res.status(200).json({mix: user.mixes[0]});
             }).catch((err) => {
                 res.status(404).json({error: "User does not exist"});
             })
@@ -74,59 +110,54 @@ router.route("/:sid/mixes/find").get(async (req, res) => {
     }
 });
 
+const updateMixes = (mixes, newMix) => {
+    let newMixes = mixes.filter(mix => mix.id !== newMix.id);
+    newMixes.push(newMix);
+    return newMixes
+};
+
 router.route("/:sid/mixes/add").post(async (req, res) => {
     try {
         let {sid} = req.params;
-        let {mix} = req.body;
+        let {mix, update} = req.body;
         if (sid && mix) {
-            console.log(mix);
-            await User.findOneAndUpdate({
-                spotifyId: sid
-            }, {
-                $push: {
-                    mixes: mix
-                }
-            }).then((user) => {
-                res.status(200).json({conf: "Mix added"});
-            }).catch((err) => {
-                res.status(404).json({error: "User does not exist"});
-            })
+            if (update) {
+                await User.findOne({
+                    spotifyId: sid
+                }).then((user) => {
+                    User.findOneAndUpdate({
+                        spotifyId: sid
+                    }, 
+                    {
+                        $set: {
+                            mixes: updateMixes(user.mixes, mix)
+                        }
+                    }).then(() => {
+                        res.status(200).json({conf: "Mixes updated"});
+                    }).catch((err) => {
+                        res.status(404).json({error: "User does not exist"});
+                        console.log(err);
+                    });
+                }).catch((err) => {
+                    res.status(404).json({error: "User does not exist"});
+                    console.log(err);
+                });
+            } else {
+                await User.findOneAndUpdate({
+                    spotifyId: sid
+                }, {
+                    $push: {
+                        mixes: mix
+                    }
+                }).then((user) => {
+                    res.status(200).json({conf: "Mix added"});
+                }).catch((err) => {
+                    res.status(404).json({error: "User does not exist"});
+                    console.log(err);
+                });
+            }
         } else {
             res.status(400).json({error: "Unable to add mix"});
-        }
-    } catch (error) {
-        res.status(400).json({error: "Malformed request"});
-    }
-});
-
-router.route("/:sid/mixes/update").post(async (req, res) => {
-    try {
-        let {sid} = req.params;
-        let {mix} = req.body;
-        if (sid && mix) {
-            await User.findOneAndUpdate({
-                spotifyId: sid,
-                mixes: {
-                    $elemMatch: {
-                        id: mix.id
-                    }
-                }
-            }, {
-                $pull: {
-                    mixes: {
-                        id: mix.id
-                    }
-                }, 
-                $push: {
-                    mixes: mix
-                }
-            }).then((user) => {
-                res.status(200).json({conf: "Mix updated"});
-            }).catch((err) => {
-                res.json({error: "User does not exist"});
-            })
-        } else {
-            res.status(400).json({error: "Unable to modify mix"});
         }
     } catch (error) {
         res.status(400).json({error: "Malformed request"});
@@ -137,6 +168,7 @@ router.route("/:sid/mixes/delete").post(async (req, res) => {
     try {
         let {sid} = req.params;
         let {mix} = req.body;
+        console.log(sid, req.body)
         if (sid && mix) {
             await User.findOneAndUpdate({
                 spotifyId: sid,
@@ -157,7 +189,7 @@ router.route("/:sid/mixes/delete").post(async (req, res) => {
                 res.json({error: "User does not exist"});
             })
         } else {
-            res.status(400).json({error: "Unable to modify mix"});
+            res.status(400).json({error: "Unable to delete mix"});
         }
     } catch (error) {
         res.status(400).json({error: "Malformed request"});

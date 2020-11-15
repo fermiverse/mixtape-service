@@ -3,10 +3,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const shortUserSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
     spotifyId: {
         type: String,
         required: true
@@ -75,7 +71,23 @@ const userSchema = new Schema({
     },
     mixes: {
         type: [mixSchema],
-        required: false
+        required: false, 
+        default: []
+    }, 
+    cover: {
+        type: String,
+        required: false, 
+        default: ""
+    },
+    genres: {
+        type: [String],
+        required: false,
+        default: []
+    },
+    description: {
+        type: String,
+        required: false,
+        default: ""
     }
 }, {
     timestamps: true
