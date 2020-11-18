@@ -8,3 +8,5 @@ router.route("/").get((req, res) => {
     res.json({ping: 1});
 });
 
+module.exports = router;
+

@@ -25,7 +25,7 @@ connection.once("open", () => {
     console.log("MongoDB connection established successfully");
 });
 
-app.options('*', cors());
+//app.options('*', cors());
 
 app.get("/", (req, res) => {
     res.send("Hello");
