@@ -34,6 +34,9 @@ app.get("/", (req, res) => {
 const userRouter = require("./routes/users");
 app.use("/users", userRouter);
 
+const shareRouter = require("./routes/sharing");
+app.use("/sharing", shareRouter);
+
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
