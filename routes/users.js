@@ -8,6 +8,10 @@ router.route("/").get((req, res) => {
     res.json({ping: 1});
 });
 
+router.route("/").post(async (req, res) => {
+    res.json({body: req.body});
+});
+
 router.route("/:sid").get(async (req, res) => {
     try {
         let {sid} = req.params;
