@@ -38,11 +38,11 @@ router.route("/").get(async (req, res) => {
                     res.status(404).json({err: "Error adding mix"});
                 });    
             }).catch((err) => {
-                res.status(404).json({err: "Error updating"})
+                res.status(404).json({err: "Error updating"});
             });
         }
     } catch (error) {
-        res.status(400).json({err: "Malformed request"})
+        res.status(400).json({err: "Malformed request"});
     }
 });
 
