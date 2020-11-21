@@ -104,6 +104,37 @@ router.route("/:sid/mixes/find").get(async (req, res) => {
             }).then((user) => {
                 res.status(200).json({mix: user.mixes[0]});
             }).catch((err) => {
+                res.status(404).json({error: "Mix does not exist"});
+            })
+        } else {
+            res.status(400).json({error: "Missing spotify Id"});
+        }
+    } catch (error) {
+        res.status(400).json({error: "Malformed request"});
+    }
+});
+
+router.route("/:sid/mixes/findbyid").get(async (req, res) => {
+    try {
+        let {sid} = req.params;
+        let {id} = req.query;
+        if (sid && id) {
+            await User.findOne({
+                spotifyId: sid,
+                mixes: {
+                    $elemMatch: {
+                        id: id
+                    }
+                }
+            }, {
+                mixes: {
+                    $elemMatch: {
+                        id: id
+                    }
+                }
+            }).then((user) => {
+                res.status(200).json({mix: user.mixes[0]});
+            }).catch((err) => {
                 res.status(404).json({error: "User does not exist"});
             })
         } else {
