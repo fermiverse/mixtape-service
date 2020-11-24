@@ -203,7 +203,7 @@ router.route("/:sid/mixes/delete").post(async (req, res) => {
     try {
         let {sid} = req.params;
         let {mix} = req.body;
-        console.log(sid, req.body)
+        
         if (sid && mix) {
             await User.findOneAndUpdate({
                 spotifyId: sid,
