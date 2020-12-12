@@ -279,7 +279,7 @@ router.route("/:sid/images/delete").post(async (req, res) => {
     try {
         //console.log(req);
         let {sid} = req.params;
-        let {key} = req.query;
+        let {key} = req.body;
         if (sid && key) {
             await removeObj("mixtape-images", key).then((data) => {
                 res,json({conf: "Image successfully deleted"});
