@@ -1,6 +1,7 @@
 const router = require("express").Router();
 let cors = require("cors");
 let User = require("../models/users.model");
+const { upload, getObj, removeObj } = require("../services/imgUpload");
 
 router.use(cors());
 
@@ -227,6 +228,89 @@ router.route("/:sid/mixes/delete").post(async (req, res) => {
             res.status(400).json({error: "Unable to delete mix"});
         }
     } catch (error) {
+        res.status(400).json({error: "Malformed request"});
+    }
+});
+
+const singleUpload = upload.single("image");
+
+const getImageUri = (sid, key) => {
+    return `https://api.fermiverse.com/users/${sid}/images/?key=${key}`;
+};
+
+router.route("/:sid/images/upload").post((req, res) => {
+    try {
+        //console.log(req);
+        let {sid} = req.params;
+        if (sid) {
+            singleUpload(req, res, function (err) {
+                if (err) {
+                    return res.status(422).send({errors: [{title: 'File Upload Error', detail: err.message}] });
+                }
+                if (req.file) {
+                    let newImage = {
+                        uri: getImageUri(sid, req.file.key),
+                        name: req.file.key,
+                        size: req.file.size,
+                        sourceName: req.file.originalname
+                    };
+                    let resp;
+                    User.findOneAndUpdate({spotifyId: sid}, {
+                        $push: {
+                            images: newImage
+                        }
+                    }).then(data => {
+                        return res.json({uri: getImageUri(sid, req.file.key)});
+                    }).catch(err => {
+                        console.log(err);
+                        return res.json({error: "Error updating DB"});
+                    });
+                }
+            });
+        } else {
+            res.status(400).json({error: "Unable to upload file"});
+        }
+    } catch (err) {
+        res.status(400).json({error: "Malformed request"});
+    }
+});
+
+router.route("/:sid/images/delete").post(async (req, res) => {
+    try {
+        //console.log(req);
+        let {sid} = req.params;
+        let {key} = req.query;
+        if (sid && key) {
+            await removeObj("mixtape-images", key).then((data) => {
+                res,json({conf: "Image successfully deleted"});
+            }).catch((err) => {
+                res.json({error: "Unable to delete image"});
+            })
+        } else {
+            res.status(400).json({error: "Unable to delete image"});
+        }
+    } catch (err) {
+        res.status(400).json({error: "Malformed request"});
+    }
+});
+
+router.route("/:sid/images").get(async (req, res) => {
+    try {
+        //console.log(req);
+        let {sid} = req.params;
+        let {key} = req.query;
+        if (sid && key) {
+            await getObj("mixtape-images", key).then((data) => {
+                res.writeHead(200, {"Content-Type": "image/gif"});
+                res.write(data, "binary");
+                res.end();
+            }).catch((err) => {
+                res.json({error: "Unable to pull image"})
+            })
+        } else {
+            res.status(400).json({error: "Unable to fetch image"});
+        }
+    } catch (err) {
         res.status(400).json({error: "Malformed request"});
     }
 });

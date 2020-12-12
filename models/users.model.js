@@ -60,6 +60,13 @@ const mixSchema = new Schema({
     timestamps: true
 });
 
+const imageSchema = new Schema({
+    sourceName: String,
+    name: String,
+    size: Number,
+    uri: String
+});
+
 const userSchema = new Schema({
     name: {
         type: String,
@@ -88,6 +95,11 @@ const userSchema = new Schema({
         type: String,
         required: false,
         default: ""
+    },
+    images: {
+        type: [imageSchema],
+        required: false,
+        default: []
     }
 }, {
     timestamps: true
