@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 
 app.use(cookieParser());
 
-const uri = "mongodb+srv://aalaapnair:geetanair@cluster0.ld8hs.mongodb.net/mixtape?retryWrites=true&w=majority" || process.env.ATLAS_URI;
+const uri = process.env.ATLAS_URI;
 mongoose.connect(uri, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true}, function(error) {
     if (error) console.log("Error connecting: ", error);
 });
