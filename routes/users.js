@@ -3,12 +3,15 @@ let cors = require("cors");
 let User = require("../models/users.model");
 const { upload, getObj, removeObj } = require("../services/imgUpload");
 
+/*
 const whitelist = ["https://mixtape.fermiverse.com"];
 const corsOptions = {
     origin: whitelist,
     methods: ["GET", "POST", "PUT"]
 };
 router.use(cors(corsOptions));
+*/
+router.use(cors());
 
 router.route("/").get((req, res) => {
     res.json({ping: 1});
