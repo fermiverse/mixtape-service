@@ -290,7 +290,7 @@ router.route("/:sid/images/delete").post(async (req, res) => {
         let {key} = req.body;
         if (sid && key) {
             await removeObj("mixtape-images", key).then((data) => {
-                res,json({conf: "Image successfully deleted"});
+                res.json({conf: "Image successfully deleted"});
             }).catch((err) => {
                 res.json({error: "Unable to delete image"});
             })
